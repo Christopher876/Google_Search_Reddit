@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'google_search.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,6 +48,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  var random = Random.secure();
+  String sample = "";
+
+  void _setSample(){
+    setState(() {
+      sample = "Congrats the number is now below 0!";
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -53,11 +64,13 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      if(_counter >= 20){
+      _counter+=random.nextInt(100);
+      if(_counter >= 200){
         _counter = -20;
-        return;
+        _setSample();
       }
-      _counter+=2;
+      else
+        sample = ""; 
     });
   }
 
@@ -106,12 +119,17 @@ class _MyHomePageState extends State<MyHomePage> {
               'Welcome to the app that will search Reddit for you using google because that seems to be the best way to search reddit!',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            Text(
+              sample,
+              style: TextStyle(color: Colors.red,fontStyle: FontStyle.italic),
             )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        //onPressed: _incrementCounter,
+        onPressed: TestGet,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
