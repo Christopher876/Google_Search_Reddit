@@ -1,9 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'package:beautifulsoup/beautifulsoup.dart';
+import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 
 List<Result> _parseResults(http.Response response){
-  List<Result> results = new List(); 
   Beautifulsoup soup = Beautifulsoup(response.body);
   var entries = soup.find_all("div").map((e) => e.getElementsByClassName("kCrYT")).toList();
   for (var entry in entries) {
@@ -13,12 +13,12 @@ List<Result> _parseResults(http.Response response){
           String title = entry[i].getElementsByTagName("a")[0].getElementsByClassName("BNeawe vvjwJb AP7Wnd")[0].innerHtml;
           String url = entry[i].getElementsByTagName("a")[0].attributes["href"].replaceFirst("/url?q=", "");
 
-          if(results.length != 0){
-            if(title != results[results.length - 1].title){
-              results.add(new Result(title,url));
+          if(Globals.results.length != 0){
+            if(title != Globals.results[Globals.results.length - 1].title){
+              Globals.results.add(new Result(title,url));
             }
           }else{
-            results.add(new Result(title,url));
+            Globals.results.add(new Result(title,url));
           }
         }
       }
@@ -30,11 +30,12 @@ List<Result> _parseResults(http.Response response){
     }
     
   }
-  for (var result in results) {
+  for (var result in Globals.results) {
     print(result.title);
     print(result.url);
     print("-------------------------------");
   }
+  return Globals.results;
 }
 
 //Convert search term to a term that google will understand i.e. Not " " but instead +
@@ -44,7 +45,7 @@ String _convert_search_term(String term){
   return term;
 }
 
-Future<http.Response> search(String term) async {
+Future<List<Result>> search(String term) async {
   String search_term = _convert_search_term(term); 
   final response =
       await http.get('https://www.google.com/search?q=reddit%3A'+term);
@@ -56,4 +57,5 @@ Future<http.Response> search(String term) async {
     // If that response was not OK, throw an error.
     throw Exception('Failed to load post');
   }
+  return Globals.results;
 }

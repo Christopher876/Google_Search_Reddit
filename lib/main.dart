@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:reddit_google_search/Globals.dart';
+import 'package:reddit_google_search/Result.dart';
 import 'google_search.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -50,9 +53,10 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   var random = Random.secure();
   String sample = "";
+  List<Result> results = new List(); 
 
   final List<String> entries = <String>['A', 'B', 'C'];
-final List<int> colorCodes = <int>[600, 500, 100];
+  final List<int> colorCodes = <int>[600, 500, 100];
 
   final searchTermController = TextEditingController();
 
@@ -86,6 +90,28 @@ final List<int> colorCodes = <int>[600, 500, 100];
     super.dispose();
   }
 
+  _launchURL(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+  void _handleRequest() async{
+    results = await search(searchTermController.text);     
+    setState(() {
+      print("WORK!");
+      print(results[0].title); 
+    });
+  }
+
+  void _updatePlease(int index){
+    setState(() {
+      entries.insert(index, 'Planet');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,19 +132,24 @@ final List<int> colorCodes = <int>[600, 500, 100];
             ),
             FlatButton(
               child: Text("Go"),
-              onPressed: () => search(searchTermController.text),
+              onPressed: () => _handleRequest(),
             ), 
             ],),
-          ListView.builder(
+
+          new Expanded(child:ListView.builder(
             shrinkWrap: true,
             padding: const EdgeInsets.all(8),
-            itemCount: entries.length,
+            itemCount: results.length,
             itemBuilder: (BuildContext context, int index) {
-            return new GestureDetector(
-              onTap: ,
-            ),
-            })  
-        ])
+              return Card(
+                child:ListTile(
+                  title:Text(results[index].title),
+                  onTap: () => _launchURL(results[index].url),
+                )
+              );
+            })
+          )]
+        )
     );
   }
 }
