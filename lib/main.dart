@@ -51,6 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
   var random = Random.secure();
   String sample = "";
 
+  final List<String> entries = <String>['A', 'B', 'C'];
+final List<int> colorCodes = <int>[600, 500, 100];
+
+  final searchTermController = TextEditingController();
+
   void _setSample(){
     setState(() {
       sample = "Congrats the number is now below 0!";
@@ -75,64 +80,45 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    searchTermController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body:
+        Column(children: <Widget>[ 
+          Row(children: <Widget>[
+            new Container(
+              width:340,
+              height:30,
+              child:
+                TextField(
+                  controller: searchTermController,
+                  textAlignVertical: TextAlignVertical.bottom,
+                ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+            FlatButton(
+              child: Text("Go"),
+              onPressed: () => search(searchTermController.text),
+            ), 
+            ],),
+          ListView.builder(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8),
+            itemCount: entries.length,
+            itemBuilder: (BuildContext context, int index) {
+            return new GestureDetector(
+              onTap: ,
             ),
-            Text(
-              'Welcome to the app that will search Reddit for you using google because that seems to be the best way to search reddit!',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-            Text(
-              sample,
-              style: TextStyle(color: Colors.red,fontStyle: FontStyle.italic),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        //onPressed: _incrementCounter,
-        onPressed: search,
-        tooltip: 'Search',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+            })  
+        ])
     );
   }
 }
