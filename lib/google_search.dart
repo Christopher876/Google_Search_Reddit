@@ -35,11 +35,12 @@ class GoogleSearch{
       }
     
     }
+    /*
     for (var result in Globals.results) {
       print(result.title);
       print(result.url);
       print("-------------------------------");
-  }
+    }*/
   return Globals.results;
 }
 
