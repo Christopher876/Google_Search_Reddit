@@ -44,17 +44,28 @@ class GoogleSearch{
   return Globals.results;
 }
 
-Future<List<Result>> search(String term) async {
-  final response =
-      await http.get('https://www.google.com/search?q=reddit%3A'+term);
-  if (response.statusCode == 200) {
-    // If server returns an OK response, parse the JSON.
-    _parseResults(response);
+  Future<List<Result>> search(String term) async {
+    final response =
+        await http.get('https://www.google.com/search?q=reddit%3A'+term);
+    if (response.statusCode == 200) {
+      //Get the first page
+      _parseResults(response);
 
-  } else {
-    // If that response was not OK, throw an error.
-    throw Exception('Failed to load post');
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+
+    final response2 = await http.get('https://www.google.com/search?q=reddit%3A'+term+"&start=10");
+    if (response2.statusCode == 200) {
+      //Get the first page
+      _parseResults(response2);
+    } else {
+      // If that response was not OK, throw an error.
+      throw Exception('Failed to load post');
+    }
+
+    Globals.loading = false;
+    return Globals.results;
   }
-  return Globals.results;
-}
 }

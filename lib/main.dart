@@ -1,11 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 import 'package:reddit_google_search/ThemeSwitcher.dart';
+import 'package:reddit_google_search/settings.dart';
 import 'google_search.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,16 +16,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
+        brightness: Brightness.light,
         primarySwatch: Colors.blue,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
       ),
       home: MyHomePage(title: 'Google Reddit Search'),
     );
@@ -66,9 +61,14 @@ class _MyHomePageState extends State<MyHomePage> {
   
   //Get called user searches for a term and returns the results to the listview
   void _handleRequest() async{
+    Globals.loading = true;
+    //Take focus away from the keyboard so it hides
+    FocusScope.of(context).requestFocus(FocusNode());
+    results.clear();
     results = await googleSearch.search(searchTermController.text);     
-    setState(() { 
-    });
+    
+    //Refresh the list
+    setState(() { });
   }
 
   @override
@@ -80,38 +80,44 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body:
         Column(children: <Widget>[ 
-          Row(children: <Widget>[
-            new Container(
-              width:340,
-              height:30,
-              child:
-                TextField(
-                  controller: searchTermController,
-                  textAlignVertical: TextAlignVertical.bottom,
+              TextField(
+                controller: searchTermController,
+                textAlignVertical: TextAlignVertical.bottom,
+                onSubmitted: (done) => _handleRequest(),
+                decoration: new InputDecoration.collapsed(
+                  hintText: "Search"
                 ),
-            ),
-            FlatButton(
-              child: Text("Go"),
-              onPressed: () => _handleRequest(),
-            ), 
-            ],),
+                style: new TextStyle(
+                  fontSize: 20.0,
+                  height: 2.0,
 
-          new Expanded(child:ListView.builder(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(8),
-            itemCount: results.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                color: themeSwitcher.cardTheme,
-                child:ListTile(
-                  title:Text(results[index].title),
-                  onTap: () => _launchURL(results[index].url),
-                )
-              );
-            })
-          )]
-        ),
-        backgroundColor: themeSwitcher.backgroundTheme,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            Expanded(
+              child:
+                new ModalProgressHUD(
+                  child:ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(8),
+                    itemCount: results.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Card(
+                        //color: themeSwitcher.cardTheme,
+                        child:ListTile(
+                          title:Text(results[index].title),
+                          onTap: () => _launchURL(results[index].url),
+                        )
+                      );
+                    }),
+                  inAsyncCall: Globals.loading,
+                  color: ThemeSwitcher.hexToColor("#303030"),
+              )
+              ),
+            ]
+          ),         
+        
+        //backgroundColor: themeSwitcher.backgroundTheme,
         drawer: Drawer(
           child: 
             ListView(
@@ -125,7 +131,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ListTile(
                   title: Text("Settings"),
                   onTap: (){
-                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(),));
+                    //Navigator.pop(context);
                   },
                 )
               ],
