@@ -4,50 +4,46 @@ import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 
 class GoogleSearch{
-  List<Result> _parseResults(http.Response response){
-  Beautifulsoup soup = Beautifulsoup(response.body);
-  var entries = soup.find_all("div").map((e) => e.getElementsByClassName("kCrYT")).toList();
-  for (var entry in entries) {
-    try{
-      if(entry.length == 2){
-        for(int i = 0; i < entry.length;i++){
-          String title = entry[i].getElementsByTagName("a")[0].getElementsByClassName("BNeawe vvjwJb AP7Wnd")[0].innerHtml;
-          String url = entry[i].getElementsByTagName("a")[0].attributes["href"].replaceFirst("/url?q=", "");
 
-          if(Globals.results.length != 0){
-            if(title != Globals.results[Globals.results.length - 1].title){
+  List<Result> _parseResults(http.Response response){
+    Beautifulsoup soup = Beautifulsoup(response.body);
+    var entries = soup.find_all("div").map((e) => e.getElementsByClassName("kCrYT")).toList();
+    for (var entry in entries) {
+      try{
+        if(entry.length == 2){
+          for(int i = 0; i < entry.length;i++){
+            String title = entry[i].getElementsByTagName("a")[0].getElementsByClassName("BNeawe vvjwJb AP7Wnd")[0].innerHtml;
+            String url = entry[i].getElementsByTagName("a")[0].attributes["href"].replaceFirst("/url?q=", "");
+
+            if(Globals.results.length != 0){
+              if(title != Globals.results[Globals.results.length - 1].title){
+                //Replace the last part of the string so that reddit will not point to a specific comment that may or may not exist
+                if(url.contains("&sa"))
+                  url = url.substring(0,url.indexOf("&sa"));
+                Globals.results.add(new Result(title,url));
+              }
+            }else{
               Globals.results.add(new Result(title,url));
             }
-          }else{
-            Globals.results.add(new Result(title,url));
           }
         }
-      }
-      else{
-        continue;
-      }
-    }catch (e){
+        else{
+          continue;
+        }
+      }catch (e){
 
-    }
+      }
     
-  }
-  for (var result in Globals.results) {
-    print(result.title);
-    print(result.url);
-    print("-------------------------------");
+    }
+    for (var result in Globals.results) {
+      print(result.title);
+      print(result.url);
+      print("-------------------------------");
   }
   return Globals.results;
 }
 
-//Convert search term to a term that google will understand i.e. Not " " but instead +
-String _convert_search_term(String term){
-  if(term.contains(" "))
-    term = term.replaceAll(" ", "+");
-  return term;
-}
-
 Future<List<Result>> search(String term) async {
-  String search_term = _convert_search_term(term); 
   final response =
       await http.get('https://www.google.com/search?q=reddit%3A'+term);
   if (response.statusCode == 200) {

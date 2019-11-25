@@ -43,7 +43,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Result> results = new List();
   GoogleSearch googleSearch = new GoogleSearch();
-  ThemeSwitcher themeSwitcher = new ThemeSwitcher(); 
+  ThemeSwitcher themeSwitcher = new ThemeSwitcher();
+  CustomColors customColors = new CustomColors(); 
 
   final searchTermController = TextEditingController();
 
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        
+
       ),
       body:
         Column(children: <Widget>[ 
@@ -111,6 +112,25 @@ class _MyHomePageState extends State<MyHomePage> {
           )]
         ),
         backgroundColor: themeSwitcher.backgroundTheme,
+        drawer: Drawer(
+          child: 
+            ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  child: Text("Placeholder Text"),
+                  decoration: BoxDecoration(
+                    color: themeSwitcher.drawerHeaderTheme),
+                ),
+                ListTile(
+                  title: Text("Settings"),
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            ),
+        ),
     );
   }
 }
