@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
+import 'package:reddit_google_search/ThemeSwitcher.dart';
 import 'google_search.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,16 +34,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -50,46 +41,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  var random = Random.secure();
-  String sample = "";
-  List<Result> results = new List(); 
-
-  final List<String> entries = <String>['A', 'B', 'C'];
-  final List<int> colorCodes = <int>[600, 500, 100];
+  List<Result> results = new List();
+  GoogleSearch googleSearch = new GoogleSearch();
+  ThemeSwitcher themeSwitcher = new ThemeSwitcher(); 
 
   final searchTermController = TextEditingController();
 
-  void _setSample(){
-    setState(() {
-      sample = "Congrats the number is now below 0!";
-    });
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter+=random.nextInt(100);
-      if(_counter >= 200){
-        _counter = -20;
-        _setSample();
-      }
-      else
-        sample = ""; 
-    });
-  }
-
   @override
+  // Clean up the controller when the widget is disposed.
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     searchTermController.dispose();
     super.dispose();
   }
 
+  //Launch the reddit post attached to the result that was returned
   _launchURL(String url) async {
   if (await canLaunch(url)) {
     await launch(url);
@@ -97,18 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
     throw 'Could not launch $url';
   }
 }
-
+  
+  //Get called user searches for a term and returns the results to the listview
   void _handleRequest() async{
-    results = await search(searchTermController.text);     
-    setState(() {
-      print("WORK!");
-      print(results[0].title); 
-    });
-  }
-
-  void _updatePlease(int index){
-    setState(() {
-      entries.insert(index, 'Planet');
+    results = await googleSearch.search(searchTermController.text);     
+    setState(() { 
     });
   }
 
@@ -117,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        
       ),
       body:
         Column(children: <Widget>[ 
@@ -142,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: results.length,
             itemBuilder: (BuildContext context, int index) {
               return Card(
+                color: themeSwitcher.cardTheme,
                 child:ListTile(
                   title:Text(results[index].title),
                   onTap: () => _launchURL(results[index].url),
@@ -149,7 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             })
           )]
-        )
+        ),
+        backgroundColor: themeSwitcher.backgroundTheme,
     );
   }
 }

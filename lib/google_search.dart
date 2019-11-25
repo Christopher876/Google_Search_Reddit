@@ -3,7 +3,8 @@ import 'package:beautifulsoup/beautifulsoup.dart';
 import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 
-List<Result> _parseResults(http.Response response){
+class GoogleSearch{
+  List<Result> _parseResults(http.Response response){
   Beautifulsoup soup = Beautifulsoup(response.body);
   var entries = soup.find_all("div").map((e) => e.getElementsByClassName("kCrYT")).toList();
   for (var entry in entries) {
@@ -58,4 +59,5 @@ Future<List<Result>> search(String term) async {
     throw Exception('Failed to load post');
   }
   return Globals.results;
+}
 }
