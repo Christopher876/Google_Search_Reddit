@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 import 'package:reddit_google_search/ThemeSwitcher.dart';
+import 'package:reddit_google_search/duckduckgo_search.dart';
 import 'package:reddit_google_search/settings.dart';
 import 'google_search.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -61,12 +62,15 @@ class _MyHomePageState extends State<MyHomePage> {
   
   //Get called user searches for a term and returns the results to the listview
   void _handleRequest() async{
+    DDGSearch duckduckgo_search = new DDGSearch();
+    duckduckgo_search.search("term");
+    /*
     Globals.loading = true;
     //Take focus away from the keyboard so it hides
     FocusScope.of(context).requestFocus(FocusNode());
     results.clear();
     results = await googleSearch.search(searchTermController.text);     
-    
+    */
     //Refresh the list
     setState(() { });
   }
