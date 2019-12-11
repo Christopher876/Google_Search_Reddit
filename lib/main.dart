@@ -62,8 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
   
   //Get called user searches for a term and returns the results to the listview
   void _handleRequest() async{
-    DDGSearch duckduckgo_search = new DDGSearch();
-    duckduckgo_search.search("term");
+    DDGSearch duckduckgoSearch = new DDGSearch();
+    results.clear();
+    results = await duckduckgoSearch.search(searchTermController.text);
+    setState(() { });
     /*
     Globals.loading = true;
     //Take focus away from the keyboard so it hides
@@ -72,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
     results = await googleSearch.search(searchTermController.text);     
     */
     //Refresh the list
-    setState(() { });
   }
 
   @override
