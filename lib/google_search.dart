@@ -4,6 +4,7 @@ import 'package:reddit_google_search/Globals.dart';
 import 'package:reddit_google_search/Result.dart';
 
 class GoogleSearch{
+  String _term;
 
   List<Result> _parseResults(http.Response response){
     Beautifulsoup soup = Beautifulsoup(response.body);
@@ -45,6 +46,7 @@ class GoogleSearch{
 }
 
   Future<List<Result>> search(String term) async {
+    _term = term;
     final response =
         await http.get('https://www.google.com/search?q=reddit%3A'+term);
     if (response.statusCode == 200) {

@@ -48,10 +48,4 @@ class SettingsPage extends State<Settings>{
     );
   }
 
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return null;
-  }
-  
 }

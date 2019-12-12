@@ -44,12 +44,22 @@ class _MyHomePageState extends State<MyHomePage> {
   ThemeSwitcher themeSwitcher = new ThemeSwitcher();
   CustomColors customColors = new CustomColors(); 
 
-  final searchTermController = TextEditingController();
+  TextEditingController _searchTermController;
+  ScrollController _listViewController;
+
+  bool _test = false;
+
+  @override
+  void initState(){
+    _searchTermController = TextEditingController();
+    _listViewController = ScrollController();
+    super.initState();
+  }
 
   @override
   // Clean up the controller when the widget is disposed.
   void dispose() {
-    searchTermController.dispose();
+    _searchTermController.dispose();
     super.dispose();
   }
 
@@ -61,6 +71,25 @@ class _MyHomePageState extends State<MyHomePage> {
     throw 'Could not launch $url';
   }
 }
+
+  //Listen for the scroll events on the ListView list
+  void _scrollListener() async{
+    switch(Globals.searchEngine){
+      case SearchEngine.google:
+        // TODO: Handle this case.
+        break;
+      case SearchEngine.ddg:
+        //If the user has scrolled about 75% of the list's length then load the next set of results
+        if(_listViewController.offset > _listViewController.position.maxScrollExtent * 0.75 && !_test){
+          _test = true;
+          results.addAll(await duckduckgoSearch.searchNextPage());
+          setState((){});
+          _test = false;
+          print("Added more posts!");
+        }
+        break;
+    }
+  }
   
   //Get called user searches for a term and returns the results to the listview
   void _handleRequest() async{
@@ -68,13 +97,14 @@ class _MyHomePageState extends State<MyHomePage> {
     results.clear();
     switch(Globals.searchEngine){
       case SearchEngine.google:
-        results = await duckduckgoSearch.search(searchTermController.text);
+        results = await googleSearch.search(_searchTermController.text); 
         break;
       case SearchEngine.ddg:
-        results = await googleSearch.search(searchTermController.text); 
+        results = await duckduckgoSearch.search(_searchTermController.text);
         break;
     }
     setState(() { });
+    _listViewController.addListener(_scrollListener);
   }
 
   @override
@@ -87,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body:
         Column(children: <Widget>[ 
               TextField(
-                controller: searchTermController,
+                controller: _searchTermController,
                 textAlignVertical: TextAlignVertical.bottom,
                 onSubmitted: (done) => _handleRequest(),
                 decoration: new InputDecoration.collapsed(
@@ -104,6 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child:
                 new ModalProgressHUD(
                   child:ListView.builder(
+                    controller: _listViewController,
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(8),
                     itemCount: results.length,
@@ -137,8 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ListTile(
                   title: Text("Settings"),
                   onTap: (){
+                    Navigator.pop(context);
                     Navigator.push(context, MaterialPageRoute(builder: (context) => Settings(),));
-                    //Navigator.pop(context);
                   },
                 )
               ],
